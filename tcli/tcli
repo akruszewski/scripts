@@ -1,0 +1,54 @@
+#!/bin/sh
+
+#not working
+get_token() {
+	echo $(curl "https://trello.com/1/connect?key=${TRELLO_KEY}name=tcli&response_type=token&scope=read,write&expiration=never")
+}
+
+get_boards() {
+	echo $(curl -s "https://api.trello.com/1/members/${TRELLO_MEMBER_NAME}/boards?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}")\
+		| jq -r '.[] | .id + "\t" + .name'
+}
+
+get_board() {
+	board_id=$(get_boards | grep $1 | cut -f1)
+	echo $(curl -s "https://api.trello.com/1/boards/${board_id}/cards?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}")\
+		 | jq -r '.[] | "\n\nURL:\n" + .shortUrl + "\n\nID:\n" + .id + "\n\nTITLE:\n" + .name + "\n\nDESCRIPTION:\n\n" + .desc'
+}
+
+get_card() {
+	echo $(curl -s "https://api.trello.com/1/cards/${1}/?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}")\
+		 | jq -r '. | "\n\nID:\n" + .id + "\n\nTITLE:\n" + .name + "\n\nDESCRIPTION:\n\n" + .desc'
+}
+
+case $1 in
+	"board")
+		case $2 in
+			"list")
+				get_board $3
+				;;
+			*)
+				get_boards
+				;;
+		esac
+		;;
+	"card")
+		case $2 in
+			"-n")
+				get_card $3
+				;;
+			*)
+				;;
+		esac
+		;;
+	"list")
+		case $2 in
+			"-n")
+				get_card $3
+				;;
+			*)
+				;;
+		esac
+		;;
+
+esac

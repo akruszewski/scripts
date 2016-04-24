@@ -1,0 +1,32 @@
+#!/bin/sh
+
+get_card() {
+	echo $(curl -s "https://api.trello.com/1/cards/${1}/?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}")\
+		 | jq -r '. | "\n\nID:\n" + .id + "\n\nTITLE:\n" + .name + "\n\nDESCRIPTION:\n\n" + .desc'
+}
+
+
+case $1 in
+	"-c")
+		counter=0
+		for arg in ${1+$@}; do
+			$counter=$(($counter+1))
+			case ${arg} in
+				"-b")
+					echo ${$counter+$@}
+					;;
+				"-d")
+					echo
+					;;
+				"-n")
+					;;
+				"-l")
+					;;
+			esac
+		done
+		;;
+	"-l")
+		;;
+	"-m")
+		;;
+esac

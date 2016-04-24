@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo $(curl -s "https://api.trello.com/1/members/${TRELLO_MEMBER_NAME}/boards?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}")\
+	| jq -r '.[] | .id + "\t" + .name'
